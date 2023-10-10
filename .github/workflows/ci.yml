@@ -66,30 +66,48 @@ jobs:
       if: contains( matrix.variant, '-mpi-' )
       run: |
         sudo apt-get install -y libopenmpi-dev openmpi-bin
-        echo "CC=mpicc" >> $GITHUB_ENV
-        echo "CXX=mpic++" >> $GITHUB_ENV
         echo "OMPI_MCA_btl_base_warn_component_unused=0" >> $GITHUB_ENV
         echo "OMPI_MCA_btl_base_verbose=0" >> $GITHUB_ENV
         echo "MPIEXEC=mpirun --oversubscribe" >> $GITHUB_ENV
-    - name: Build PLUMED
+    - name: Get PLUMED
       run: |
-        ccache -s -M 100M
         git clone https://github.com/Iximiel/plumed2.git
         cd plumed2
-        git checkout pwPatchMasses
-        ./configure CXX="ccache $CXX" --disable-dependency-tracking LDFLAGS=-Wl,-rpath,$LD_LIBRARY_PATH --prefix="$HOME/opt"
-        make -j 4
-        make install
-        ccache -s -M 100M
+        git checkout cmakePatches
+        
+    - name: Configure CMake for Plumed
+      working-directory: ${{github.workspace}}/plumed2/build
+        # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+        # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+        #set up without warnings
+      run: > 
+        cmake -S ${{github.workspace}}/plumed2 -B .
+        -DCMAKE_CXX_COMPILER_LAUNCHER=ccache 
+        -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        -Doption_relaxed_dependencies=ON 
+        -Denable_warnings_basic=OFF 
+        -DCMAKE_INSTALL_PREFIX="$HOME/opt"
+
+    - name: Build  and install Plumed2
+      working-directory: ${{github.workspace}}/plumed2/build
+      run: |
+       ccache -s -M 100M
+       cmake --build . --config ${{env.BUILD_TYPE}} --parallel 4
+       ccache -s -M 100M
+       cmake --install
+       echo "Plumed2_DIR=$HOME/opt/lib/cmake/Plumed2" >> $GITHUB_ENV
+
     - name: Build QE
       run: |
         git clone https://gitlab.com/QEF/q-e.git
         cd q-e
         git checkout qe-7.0
-        ./configure --prefix="$HOME/opt"
-        plumed patch --engine qespresso-7.0 -p
-        make pw
-        make install
+        plumed patch --engine qespresso-7.0 -p -f
+        mkdir build
+        cd build
+        cmake ../ . -DCMAKE_INSTALL_PREFIX="$HOME/opt" -DCMAKE_CXX_COMPILER_LAUNCHER=ccache 
+        cmake --build . -j 4
+        cmake --install .
     - name: Check files
       run: |
         prefix=$HOME/opt
