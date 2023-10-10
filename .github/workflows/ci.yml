@@ -46,6 +46,7 @@ jobs:
         sudo apt-get install -y libgsl0-dev
         sudo apt-get install -y gfortran
         sudo apt-get install -y ccache
+        sudo apt-get install -y cmake
       # install INTEL at last since it modifies CC and CXX
     - name: Install INTEL compiler
       if: contains( matrix.variant, '-intel-' )
@@ -74,6 +75,7 @@ jobs:
         git clone https://github.com/Iximiel/plumed2.git
         cd plumed2
         git checkout cmakePatches
+        mkdir build
         
     - name: Configure CMake for Plumed
       working-directory: ${{github.workspace}}/plumed2/build
