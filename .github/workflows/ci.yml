@@ -101,7 +101,7 @@ jobs:
        ccache -s -M 100M
        cmake --build . --config ${{env.BUILD_TYPE}} --parallel 4
        ccache -s -M 100M
-       cmake --install
+       cmake --install .
        echo "Plumed2_DIR=$HOME/opt/lib/cmake/Plumed2" >> $GITHUB_ENV
 
     - name: Build QE
@@ -112,8 +112,8 @@ jobs:
         plumed patch --engine qespresso-7.0 -p -f
         mkdir build
         cd build
-        cmake ../ . -DCMAKE_INSTALL_PREFIX="$HOME/opt" -DCMAKE_CXX_COMPILER_LAUNCHER=ccache 
-        cmake --build . -j 4
+        cmake ../ . -DCMAKE_INSTALL_PREFIX="$HOME/opt" -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        cmake --build . --config ${{env.BUILD_TYPE}}  -j 4
         cmake --install .
     - name: Check files
       run: |
