@@ -30,14 +30,14 @@ jobs:
       BUILD_TYPE: ${{ matrix.buildType }}
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/cache@v2
+    - uses: actions/cache/restore@v3
       id: ccache-restore
       with:
         path: ~/.ccache
         key: ccache-linux${{ matrix.variant }}hash-${{ github.sha }}
         restore-keys: |
           ccache-linux${{ matrix.variant }}hash-${{ github.sha }}
-          ccache-linux${{ matrix.variant }}hash
+          ccache-linux${{ matrix.variant }}hash-
     - name: Set paths
       run: |
         echo "$HOME/opt/bin" >> $GITHUB_PATH
@@ -82,7 +82,7 @@ jobs:
       run: |
         git clone https://github.com/Iximiel/plumed2.git
         cd plumed2
-        git checkout cmakePatcheswithmaster
+        git checkout cmakePatches
         mkdir build
         
     - name: Configure CMake for Plumed
