@@ -31,10 +31,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: actions/cache@v2
+      id: ccache-restore
       with:
         path: ~/.ccache
-        key: ccache-reset1-linux${{ matrix.variant }}hash-${{ github.sha }}
-        restore-keys: ccache-reset1-linux${{ matrix.variant }}hash-
+        key: ccache-linux${{ matrix.variant }}hash-${{ github.sha }}
+        restore-keys: |
+          ccache-linux${{ matrix.variant }}hash-${{ github.sha }}
+          ccache-linux${{ matrix.variant }}hash
     - name: Set paths
       run: |
         echo "$HOME/opt/bin" >> $GITHUB_PATH
@@ -100,10 +103,8 @@ jobs:
       run: |
        ccache -s -M 100M
        cmake --build . --config ${{env.BUILD_TYPE}} --parallel 4
-       ccache -s -M 100M
        cmake --install .
        echo "Plumed2_DIR=$HOME/opt/lib/cmake/Plumed2" >> $GITHUB_ENV
-
     - name: Build QE
       run: |
         git clone https://gitlab.com/QEF/q-e.git
@@ -115,6 +116,15 @@ jobs:
         cmake ../ . -DCMAKE_INSTALL_PREFIX="$HOME/opt" -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
         cmake --build . --config ${{env.BUILD_TYPE}}  -j 4
         cmake --install .
+        ccache -s -M 100M
+    - name: storing the ccache
+      id: ccache-store
+      # this makes the cache to be updated also if compilation would file
+      if: always() 
+      uses: actions/cache/save@v3
+      with:
+          path: ~/.ccache
+          key: ccache-linux${{ matrix.variant }}hash-${{ github.sha }}
     - name: Check files
       run: |
         prefix=$HOME/opt
