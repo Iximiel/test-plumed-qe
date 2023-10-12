@@ -21,8 +21,8 @@ jobs:
       matrix:
         variant:
         - -mpi-
-        - -
-        - -intel-
+        #- - qe does not like no mpi with cmake
+        - -mpi-intel-
         buildType:
         - Release
     env:
