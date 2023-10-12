@@ -92,7 +92,7 @@ jobs:
         #set up without warnings
       run: > 
         cmake -S ${{github.workspace}}/plumed2 -B .
-        -DCMAKE_CXX_COMPILER_LAUNCHER=ccache 
+        -DCXX_COMPILER_LAUNCHER=ccache 
         -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
         -Doption_relaxed_dependencies=ON 
         -Denable_warnings_basic=OFF 
@@ -113,7 +113,7 @@ jobs:
         plumed patch --engine qespresso-7.0 -p -f
         mkdir build
         cd build
-        cmake ../ . -DCMAKE_INSTALL_PREFIX="$HOME/opt" -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        cmake ../ . -DCMAKE_INSTALL_PREFIX="$HOME/opt" -DFortran_COMPILER_LAUNCHER=ccache -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
         cmake --build . --config ${{env.BUILD_TYPE}}  -j 4
         cmake --install .
         ccache -s -M 100M
@@ -124,7 +124,7 @@ jobs:
       uses: actions/cache/save@v3
       with:
           path: ~/.ccache
-          key: ccache-linux${{ matrix.variant }}hash-${{ github.sha }}
+          key: ${{ steps.ccache-restore.outputs.cache-primary-key }}
     - name: Check files
       run: |
         prefix=$HOME/opt
