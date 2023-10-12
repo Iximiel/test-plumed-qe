@@ -20,8 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         variant:
-        - -mpi-
-        #- - qe does not like no mpi with cmake
+        - -mpi- # qe does not like no mpi with cmake
         - -mpi-intel-
         buildType:
         - Release
@@ -72,7 +71,6 @@ jobs:
         echo "FC=ifort" >> $GITHUB_ENV
     - name: Install MPI
       # install MPI at last since it modifies CC and CXX
-      if: contains( matrix.variant, '-mpi-' )
       run: |
         sudo apt-get install -y libopenmpi-dev openmpi-bin
         echo "OMPI_MCA_btl_base_warn_component_unused=0" >> $GITHUB_ENV
