@@ -23,17 +23,17 @@ jobs:
         - -mpi-
         - -
         # - -intel- #qe ./configure seem to dislike  this intel compiler
-        qeVersion: ["5.0.2", "6.2.1", "7.0", "7.2"]
+        qeVersion: ["5.0.2", "6.2.0", "7.0", "7.2"]
         include:
           - qeVersion: "5.0.2"
             qePlumedVersion: "5.0.2"
-          - qeVersion: "6.2.1"
+          - qeVersion: "6.2.0"
             qePlumedVersion: "6.2"
           - qeVersion: "7.0"
             qePlumedVersion: "7.0"
           - qeVersion: "7.2"
             qePlumedVersion: 7.2"
-            qeExtra: "--enable-legacy_plugins"
+            qeExtra: --enable-legacy_plugins
     steps:
     - uses: actions/checkout@v3
     - uses: actions/cache@v3
