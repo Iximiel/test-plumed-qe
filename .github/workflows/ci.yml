@@ -23,7 +23,15 @@ jobs:
         - -mpi-
         - -
         - -intel-
-        qeVersion: ["5.0.2", "6.2", "7.0", "7.2"]
+        include:
+        - qeVersion: "5.0.2"
+          qePlumedVersion: "5.0.2"
+        - qeVersion: "6.2.1"
+          qePlumedVersion: "6.2"
+        - qeVersion: "7.0"
+          qePlumedVersion: "7.0"
+        - qeVersion: "7.2"
+          qePlumedVersion: 7.2"
     steps:
     - uses: actions/checkout@v2
     - uses: actions/cache@v2
@@ -88,7 +96,7 @@ jobs:
         cd q-e
         git checkout qe-${{ matrix.qeVersion }}
         ./configure --prefix="$HOME/opt"
-        plumed patch --engine qespresso-${{ matrix.qeVersion }} -p
+        plumed patch --engine qespresso-${{ matrix.qePlumedVersion }} -p
         make pw
         make install
     - name: Check files
