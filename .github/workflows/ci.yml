@@ -23,7 +23,7 @@ jobs:
         - -mpi-
         - -
         - -intel-
-        qeVersion: [5.0.2, 6.2, 7.0, 7.2]
+        qeVersion: ["5.0.2", "6.2", "7.0", "7.2"]
     steps:
     - uses: actions/checkout@v2
     - uses: actions/cache@v2
