@@ -22,7 +22,7 @@ jobs:
         variant:
         - -mpi-
         - -
-        - -intel-
+        # - -intel- #qe ./configure seem to dislike  this intel compiler
         qeVersion: ["5.0.2", "6.2.1", "7.0", "7.2"]
         include:
           - qeVersion: "5.0.2"
@@ -33,6 +33,7 @@ jobs:
             qePlumedVersion: "7.0"
           - qeVersion: "7.2"
             qePlumedVersion: 7.2"
+            qeExtra: "--enable-legacy_plugins"
     steps:
     - uses: actions/checkout@v3
     - uses: actions/cache@v3
@@ -91,13 +92,18 @@ jobs:
         make -j 4
         make install
         ccache -s -M 100M
+    #this ensures that the cache for at least plumed is stored
+    - uses: actions/cache/save@v3
+      with:
+        path: ~/.ccache
+        key: ccache-reset1-linux${{ matrix.variant }}hash-${{ github.sha }}
     - name: Build QE
       run: |
         git clone https://gitlab.com/QEF/q-e.git
         cd q-e
         git checkout qe-${{ matrix.qeVersion }}
-        ./configure --prefix="$HOME/opt"
-        plumed patch --engine qespresso-${{ matrix.qeVersion }} -p
+        ./configure --prefix="$HOME/opt" ${{ matrix.qeExtra }}
+        plumed patch --engine qespresso-${{ matrix.qePlumedVersion }} -p
         make pw
         make install
     - name: Check files
