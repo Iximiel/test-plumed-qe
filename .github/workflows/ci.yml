@@ -23,11 +23,7 @@ jobs:
         - -mpi-
         - -
         - -intel-
-        qeVersion:
-        - 5.0.2
-        - 6.2
-        - 7.0
-        - 7.2
+        qeVersion: [5.0.2, 6.2, 7.0, 7.2]
     steps:
     - uses: actions/checkout@v2
     - uses: actions/cache@v2
@@ -90,9 +86,9 @@ jobs:
       run: |
         git clone https://gitlab.com/QEF/q-e.git
         cd q-e
-        git checkout qe-${matrix.qeVersion}
+        git checkout qe-${{ matrix.qeVersion }}
         ./configure --prefix="$HOME/opt"
-        plumed patch --engine qespresso-${matrix.qeVersion} -p
+        plumed patch --engine qespresso-${{ matrix.qeVersion }} -p
         make pw
         make install
     - name: Check files
