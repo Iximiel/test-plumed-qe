@@ -1,5 +1,5 @@
 #!/bin/bash
-
+exitcode=0
 for testDir in test_Si test_H2O; do
 
   cd "${testDir}" || exit 1
@@ -17,14 +17,16 @@ for testDir in test_Si test_H2O; do
         echo FAILURE
         echo "Diff for ${file%.reference}:"
         echo "$out"
-        exit 1
+        exitcode=1
       }
     else
       echo FAILURE
       echo "FILE $new does not exist"
-      exit 1
+      exitcode=1
     fi
   done
 
   cd ../
 done
+
+exit $exitcode

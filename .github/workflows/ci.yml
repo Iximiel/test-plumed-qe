@@ -106,6 +106,17 @@ jobs:
         plumed patch --engine qespresso-${{ matrix.qePlumedVersion }} -p
         make pw
         make install
+    - name: Install qe 5.0.2
+        # qe 5.* does not make install
+        if: contains( matrix.qeVersion, '5.0.2' )
+        run: |
+          prefix=$HOME/opt
+          cd $prefix
+          ln -s $HOME/q-e/PW/src/pw.x pw.x
+          ln -s $HOME/q-e/PW/src/generate_vdW_kernel_table.x generate_vdW_kernel_table.x
+          ln -s $HOME/q-e/S3DE/iotk/tools/iotk iotk
+          ln -s $HOME/q-e/S3DE/iotk/src/iotk_print_kinds.x iotk_print_kinds.x
+          ln -s $HOME/q-e/S3DE/iotk/src/iotk.x iotk.x
     - name: Check files
       run: |
         prefix=$HOME/opt
