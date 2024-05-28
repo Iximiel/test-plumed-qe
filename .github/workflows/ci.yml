@@ -23,6 +23,11 @@ jobs:
         - -mpi-
         - -
         - -intel-
+        qeVersion:
+        - 5.0.2
+        - 6.2
+        - 7.0
+        - 7.2
     steps:
     - uses: actions/checkout@v2
     - uses: actions/cache@v2
@@ -74,8 +79,9 @@ jobs:
     - name: Build PLUMED
       run: |
         ccache -s -M 100M
-        git clone https://github.com/plumed/plumed2.git
+        git clone https://github.com/Iximiel/plumed2.git
         cd plumed2
+        git checkout v2.8_qePatches
         ./configure CXX="ccache $CXX" --disable-dependency-tracking LDFLAGS=-Wl,-rpath,$LD_LIBRARY_PATH --prefix="$HOME/opt"
         make -j 4
         make install
@@ -84,9 +90,9 @@ jobs:
       run: |
         git clone https://gitlab.com/QEF/q-e.git
         cd q-e
-        git checkout qe-7.0
+        git checkout qe-${matrix.qeVersion}
         ./configure --prefix="$HOME/opt"
-        plumed patch --engine qespresso-7.0 -p
+        plumed patch --engine qespresso-${matrix.qeVersion} -p
         make pw
         make install
     - name: Check files
